@@ -1,0 +1,80 @@
+{
+    "title": "Results checker input",
+    "type": "object",
+    "schemaVersion": 1,
+    "required": ["functionalChecker"],
+    "properties": {
+        "apifyStorageId": {
+            "title": "Apify Storage ID",
+            "type": "string",
+            "description": "Id of dataset or key value store where the data are located.",
+            "editor": "textfield",
+            "example": "s5NJ77qFv8b4osiGR"
+        },
+        "recordKey": {
+            "title": "Record Key",
+            "type": "string",
+            "description": "Only specify if Apify storage id points to a key value store! This is the record key under which the data are.",
+            "editor": "textfield",
+            "example": "MY-KEY"
+        },
+        "rawData": {
+            "title": "Raw Data",
+            "type": "array",
+            "description": "Raw JSON array you want to check.",
+            "editor": "json",
+            "example": [{"url": "https://example.com","price": 20},{"url": "https://google.com","price": 30}]
+        },
+        "functionalChecker": {
+            "title": "Functional Checker",
+            "type": "string",
+            "description": "Function that returns an object with item fields as keys and values as predicates (functions that return true/false)",
+            "editor": "javascript",
+            "prefill": "() => ({\n    url: (url, item) => typeof url === 'string' && url.startsWith('http') && url.length > 10,\n    myField: (field, item) => true // this means an optional fields (always passes)\n})",
+            "example": "() => ({\n    url: (url, item) => typeof url === 'string' && url.startsWith('http'),\n    title: (title) => typeof title === 'string' && title.length >= 3,\n    itemId: (itemId) => typeof itemId === 'string' && itemId.length >= 4,\n    source: (source) => typeof source === 'string',\n    status: (status) => status === 'REMOVED',\n});"
+        },
+        "identificationFields":{
+            "title": "Identification Fields",
+            "type": "array",
+            "description": "You can specify which fields should display in the debug OUTPUT to identify bad items. By default it shows all fields which may make it unnecessary big.",
+            "editor": "json",
+            "example": ["url", "color"]
+        },
+        "noExtraFields": {
+            "title": "No extra fields",
+            "type": "boolean",
+            "description": "If checked on, the actor will consider extra fields as bad fields. Uncheck if you don't mind them",
+            "default": true
+        },
+        "limit":{
+            "title": "Limit",
+            "type": "integer",
+            "description": "How many items will be checked. Default is all",
+            "minimum": 1,
+            "unit": "items",
+            "example": 1000
+        },
+        "offset":{
+            "title": "Offset",
+            "type": "integer",
+            "description": "From which item the checking will start. Use with limit to check specific items.",
+            "minimum": 1,
+            "unit": "items",
+            "example": 20000
+        },
+        "batchSize":{
+            "title": "Batch Size",
+            "type": "integer",
+            "description": "You can change number of loaded and processed items in each batch. This is only needed if you have really huge items.",
+            "default": 50000,
+            "minimum": 1,
+            "unit": "items",
+            "example": 5000
+        },
+        "copyMode":{
+            "title": "copy mode (for debug only)",
+            "type": "boolean",
+            "description": "Check if we can remove memory leak."
+        }
+    }
+}
