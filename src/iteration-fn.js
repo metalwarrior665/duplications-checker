@@ -41,7 +41,7 @@ const checkItemField = ({ field, item, duplicatesState, showOptions, originalInd
     }
 
     // Occurrences equal minDuplications - we have to flush firstItems and push them to dataset
-    if (duplicatesState[fieldValue].count === minDuplications) {
+    if (showItems && duplicatesState[fieldValue].count === minDuplications) {
         const itemsToFlush = [...duplicatesState[fieldValue].firstItems, item];
         duplicatesState[fieldValue].outputIndexes = itemsToFlush.map((_, i) => outputIndex + i);
         outputIndex += itemsToFlush.length;
@@ -50,8 +50,10 @@ const checkItemField = ({ field, item, duplicatesState, showOptions, originalInd
     }
 
     // Third and more occurence
-    duplicatesState[fieldValue].outputIndexes.push(outputIndex);
-    outputIndex++;
+    if (showItems) {
+        duplicatesState[fieldValue].outputIndexes.push(outputIndex);
+        outputIndex++;
+    }
     return [item];
 };
 

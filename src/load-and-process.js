@@ -16,7 +16,9 @@ module.exports = async (options, offset, outputOffset) => {
         console.log(`loaded ${newItems.length} items`);
 
         const duplicateItems = iterationFn({ items: newItems, duplicatesState, preCheckFunction, field, showOptions }, offset, outputOffset);
-        await Apify.pushData(duplicateItems);
+        if (showOptions.showItems) {
+            await Apify.pushData(duplicateItems);
+        }
 
         if (offset + batchSize >= limit || newItems.length === 0) {
             console.log('All items loaded');
