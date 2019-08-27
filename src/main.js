@@ -14,14 +14,24 @@ Apify.main(async () => {
         recordKey,
         rawData,
         preCheckFunction,
-        fields,
+        field,
         limit,
         offset = 0,
-        batchSize = 50000,
+        batchSize = 1000,
+        showIndexes = true,
+        showItems = true,
+        showMissing = true,
     } = input;
 
-    // COPY_MODE = copyMode;
+    const showOptions = {
+        showIndexes,
+        showItems,
+        showMissing,
+    };
 
+    if (!field) {
+        throw new Error('Input should contain: "field"!');
+    }
     if (!apifyStorageId && !rawData) {
         throw new Error('Input should contain at least one of: "apifyStorageId" or "rawData"!');
     }
@@ -41,7 +51,7 @@ Apify.main(async () => {
     const state = await Apify.getValue('STATE');
     const duplicatesState = state
         ? state.duplicatesState
-        : fields.reduce((obj, field) => ({ ...obj, [field]: {} }), {});
+        : {};
 
     let datasetInfo;
     let kvStoreData;
@@ -74,7 +84,10 @@ Apify.main(async () => {
     }
 
     if (rawData || kvStoreData) {
-        iterationFn({ items: preCheckFunctionEvaled(rawData || kvStoreData), duplicatesState, fields });
+        const duplicateItems = iterationFn({ items: preCheckFunctionEvaled(rawData || kvStoreData), duplicatesState, field, showOptions });
+        if (showItems) {
+            await Apify.pushData(duplicateItems);
+        }
     } else if (datasetInfo) {
         await loadAndProcessResults({
             iterationFn,
@@ -83,9 +96,10 @@ Apify.main(async () => {
             batchSize,
             limit: limit || totalItemCount,
             duplicatesState,
-            fields,
+            field,
+            showOptions,
         },
-        state ? state.offset : offset);
+        state ? state.offset : offset, state ? state.outputOffset : 0);
     }
 
     await Apify.setValue('OUTPUT', prepareOutput(duplicatesState));
