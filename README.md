@@ -46,6 +46,7 @@ This actor expects a JSON object as an input. You can also set it up in a visual
 - `limit`: <[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> How many items will be checked. **Default: all**
 - `offset`: <[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> From which item the checking will start. Use with `limit` to check specific items. **Default: 0**
 - `batchSize`: <[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> You can change number of loaded and processed items in each batch. This is only needed to be changed if you have really huge items. **Default: 1000**
+- `minDuplications`: <[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> Minimum occurences to be included in the report. **Default: 2**
 - `showIndexes`: <[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> Indexes of the duplicate items will be shown in the OUTPUT report. Set to false if you don't need them. **Default: true**
 - `showItems`: <[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> Duplicate items will be pushed to a dataset. Set to false if you don't need them. **Default: true**
 - `showMissing`: <[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> Items where the values for the `field` is missing or is `null` or `''` will be included in the report **Default: true**

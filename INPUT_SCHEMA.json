@@ -64,6 +64,15 @@
             "unit": "items",
             "example": 5000
         },
+        "minDuplications":{
+            "title": "Minimum duplications",
+            "type": "integer",
+            "description": "Minimum occurences to be included in the report. Defaults to 2",
+            "minimum": 2,
+            "default": 2,
+            "unit": "occurrences",
+            "example": 2
+        },
         "showIndexes":{
             "title": "Show indexes",
             "type": "boolean",

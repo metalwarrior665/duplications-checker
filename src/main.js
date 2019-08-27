@@ -18,6 +18,7 @@ Apify.main(async () => {
         limit,
         offset = 0,
         batchSize = 1000,
+        minDuplications = 2,
         showIndexes = true,
         showItems = true,
         showMissing = true,
@@ -27,6 +28,7 @@ Apify.main(async () => {
         showIndexes,
         showItems,
         showMissing,
+        minDuplications,
     };
 
     if (!field) {
@@ -102,5 +104,5 @@ Apify.main(async () => {
         state ? state.offset : offset, state ? state.outputOffset : 0);
     }
 
-    await Apify.setValue('OUTPUT', prepareOutput(duplicatesState));
+    await Apify.setValue('OUTPUT', prepareOutput(duplicatesState, minDuplications));
 });

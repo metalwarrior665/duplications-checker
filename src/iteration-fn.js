@@ -3,7 +3,7 @@
 // - [item, firstItem] - second occurence of a duplicate, we need to push the first occurence item too then
 // - [item] - all other cases
 const checkItemField = ({ field, item, duplicatesState, showOptions, originalIndex, outputIndex }) => {
-    const { showIndexes, showItems, showMissing } = showOptions;
+    const { showIndexes, showItems, showMissing, minDuplications } = showOptions;
     let fieldValue = item[field];
     if (fieldValue === undefined || fieldValue === null || fieldValue === '') {
         if (showMissing) {
@@ -22,7 +22,7 @@ const checkItemField = ({ field, item, duplicatesState, showOptions, originalInd
             duplicatesState[fieldValue].originalIndexes = [originalIndex];
         }
         if (showItems) {
-            duplicatesState[fieldValue].firstItem = item;
+            duplicatesState[fieldValue].firstItems = [item];
         }
         return [];
     }
@@ -32,13 +32,21 @@ const checkItemField = ({ field, item, duplicatesState, showOptions, originalInd
         duplicatesState[fieldValue].originalIndexes.push(originalIndex);
     }
 
-    // Second occurence
-    if (duplicatesState[fieldValue].firstItem) {
-        const { firstItem } = duplicatesState[fieldValue];
-        duplicatesState[fieldValue].firstItem = undefined; // Should have better performance than delete?
-        duplicatesState[fieldValue].outputIndexes = [outputIndex, outputIndex + 1];
-        outputIndex += 2;
-        return [firstItem, item];
+    // Occrrences less than minDuplications
+    if (duplicatesState[fieldValue].count < minDuplications) {
+        if (showItems) {
+            duplicatesState[fieldValue].firstItems.push(item);
+        }
+        return [];
+    }
+
+    // Occurrences equal minDuplications - we have to flush firstItems and push them to dataset
+    if (duplicatesState[fieldValue].count === minDuplications) {
+        const itemsToFlush = [...duplicatesState[fieldValue].firstItems, item];
+        duplicatesState[fieldValue].outputIndexes = itemsToFlush.map((_, i) => outputIndex + i);
+        outputIndex += itemsToFlush.length;
+        duplicatesState[fieldValue].firstItems = undefined; // Memory cleanup. Should have better performance than delete?
+        return itemsToFlush;
     }
 
     // Third and more occurence
