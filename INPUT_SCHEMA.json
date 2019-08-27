@@ -1,8 +1,8 @@
 {
-    "title": "Results checker input",
+    "title": "Duplications checker input",
     "type": "object",
     "schemaVersion": 1,
-    "required": ["functionalChecker"],
+    "required": ["field"],
     "properties": {
         "apifyStorageId": {
             "title": "Apify Storage ID",
@@ -25,26 +25,19 @@
             "editor": "json",
             "example": [{"url": "https://example.com","price": 20},{"url": "https://google.com","price": 30}]
         },
-        "functionalChecker": {
-            "title": "Functional Checker",
+        "field": {
+            "title": "Field",
             "type": "string",
-            "description": "Function that returns an object with item fields as keys and values as predicates (functions that return true/false)",
-            "editor": "javascript",
-            "prefill": "() => ({\n    url: (url, item) => typeof url === 'string' && url.startsWith('http') && url.length > 10,\n    myField: (field, item) => true // this means an optional fields (always passes)\n})",
-            "example": "() => ({\n    url: (url, item) => typeof url === 'string' && url.startsWith('http'),\n    title: (title) => typeof title === 'string' && title.length >= 3,\n    itemId: (itemId) => typeof itemId === 'string' && itemId.length >= 4,\n    source: (source) => typeof source === 'string',\n    status: (status) => status === 'REMOVED',\n});"
+            "description": "Field in each item that will be checked for duplicates. The field must not be nested and it should contain only simple value (string or number). You can prepare your data with preCheckFunction.",
+            "editor": "textfield",
+            "example": "imageUrl"
         },
-        "identificationFields":{
-            "title": "Identification Fields",
-            "type": "array",
+        "preCheckFunction":{
+            "title": "Pre-check function",
+            "type": "string",
             "description": "You can specify which fields should display in the debug OUTPUT to identify bad items. By default it shows all fields which may make it unnecessary big.",
-            "editor": "json",
-            "example": ["url", "color"]
-        },
-        "noExtraFields": {
-            "title": "No extra fields",
-            "type": "boolean",
-            "description": "If checked on, the actor will consider extra fields as bad fields. Uncheck if you don't mind them",
-            "default": true
+            "editor": "javascript",
+            "example": "(data) => data.map((item) => ({ url: item.url, imageSrc: item.images && item.images[0] ? item.images[0].src : null }))"
         },
         "limit":{
             "title": "Limit",
@@ -66,15 +59,28 @@
             "title": "Batch Size",
             "type": "integer",
             "description": "You can change number of loaded and processed items in each batch. This is only needed if you have really huge items.",
-            "default": 50000,
+            "default": 1000,
             "minimum": 1,
             "unit": "items",
             "example": 5000
         },
-        "copyMode":{
-            "title": "copy mode (for debug only)",
+        "showIndexes":{
+            "title": "Show indexes",
             "type": "boolean",
-            "description": "Check if we can remove memory leak."
+            "description": "Indexes of the duplicate items will be shown in the OUTPUT report. Set to false if you don't need them.",
+            "default": true
+        },
+        "showItems":{
+            "title": "Show items",
+            "type": "boolean",
+            "description": "Duplicate items will be pushed to a dataset. Set to false if you don't need them.",
+            "default": true
+        },
+        "showMissing":{
+            "title": "Show missing fields",
+            "type": "boolean",
+            "description": "Items where the values for the `field` is missing or is `null` or `''` will be included in the report.",
+            "default": true
         }
     }
 }
