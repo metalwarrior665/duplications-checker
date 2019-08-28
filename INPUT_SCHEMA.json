@@ -60,15 +60,13 @@
             "title": "Show items",
             "type": "boolean",
             "description": "Duplicate items will be pushed to a dataset. Set to false if you don't need them.",
-            "default": true,
-            "groupCaption": "Show options"
+            "default": true
         },
         "showMissing":{
             "title": "Show missing fields",
             "type": "boolean",
             "description": "Items where the values for the `field` is missing or is `null` or `''` will be included in the report.",
-            "default": true,
-            "groupCaption": "Show options"
+            "default": true
         },
         "limit":{
             "title": "Limit",
@@ -86,8 +84,7 @@
             "description": "From which item the checking will start. Use with limit to check specific items.",
             "minimum": 1,
             "unit": "items",
-            "example": 20000,
-            "sectionCaption": "dataset pagination"
+            "example": 20000
         },
         "batchSize":{
             "title": "Batch Size",
@@ -96,8 +93,7 @@
             "default": 1000,
             "minimum": 1,
             "unit": "items",
-            "example": 5000,
-            "sectionCaption": "dataset pagination"
+            "example": 5000
         }
     }
 }
