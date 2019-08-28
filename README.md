@@ -36,20 +36,31 @@ Duplications Checker is an [Apify actor](https://apify.com/actors) that helps yo
 -->
 
 ### Input
-This actor expects a JSON object as an input. You can also set it up in a visual UI editor on Apify. You can find examples in the Input and Example Run tabs of the actor page in Apify Store.
+This actor expects a JSON object as an input. You can also set it up in a visual UI editor on Apify. You can find examples in the Input and Example Run tabs of the actor page in Apify Store. All the input fields (regardless of section) are top level fields.
 
-- `apifyStorageId` <[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type)> Apify ID of the storage where the data are located. Can be ID of a dataset or key-value store. Key-value-store requires to set also a `inputRecordKey` **You have specify this or `rawData` but not both**
-- `inputRecordKey` <[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type)> Record key from where it loads data in case of key value store data. **Only allowed when `apifyStorageId` points to a key value store**
-- `rawData` <[array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)> Array of objects to be checked. **You have specify this or `apifyStorageId` but not both**.
+**Main input fields**
+
+- `datasetId` <[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type)> Id of dataset where the data are located. If you need to use other input types like Key value store or raw JSON, use `keyValueStoreRecord` or `rawData` **You have specify this, `keyValueStoreRecord` or `rawData` but only one of them**
 - `field` <[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type)> Field in each item that will be checked for duplicates. The field must not be nested and it should contain only simple value (string or number). You can prepare your data with [preCheckFunction](#preCheckFunction). **Required**
 - `preCheckFunction` <[stringified function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions)> Stringified javascipt function that can apply arbitrary transformation to the input data before the check. See [preCheckFunction](#preCheckFunction) section. **Optional**
-- `limit`: <[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> How many items will be checked. **Default: all**
-- `offset`: <[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> From which item the checking will start. Use with `limit` to check specific items. **Default: 0**
-- `batchSize`: <[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> You can change number of loaded and processed items in each batch. This is only needed to be changed if you have really huge items. **Default: 1000**
 - `minDuplications`: <[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> Minimum occurences to be included in the report. **Default: 2**
+
+**Show options**
+
 - `showIndexes`: <[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> Indexes of the duplicate items will be shown in the OUTPUT report. Set to false if you don't need them. **Default: true**
 - `showItems`: <[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> Duplicate items will be pushed to a dataset. Set to false if you don't need them. **Default: true**
 - `showMissing`: <[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> Items where the values for the `field` is missing or is `null` or `''` will be included in the report **Default: true**
+
+**Dataset pagination options**
+
+- `limit`: <[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> How many items will be checked. **Default: all**
+- `offset`: <[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> From which item the checking will start. Use with `limit` to check specific items. **Default: 0**
+- `batchSize`: <[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> You can change number of loaded and processed items in each batch. This is only needed to be changed if you have really huge items. **Default: 1000**
+
+**Other data sources**
+
+- `keyValueStoreRecord` <[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type)> ID and record key if you want to load from KV store. Format is `{keyValueStoreId}+{recordKey}`, e.g. `s5NJ77qFv8b4osiGR+MY-KEY`. **You have specify this, `datasetId` or `rawData` but only one of them**
+- `rawData` <[array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)> Array of objects to be checked. **You have specify this, `keyValueStoreRecord` or `datasetId` but only one of them***.
 
 ### preCheckFunction
 `preCheckFunction` is useful to transform the input data before the actual check. Its main usefulness is to ensure that the field you are checking is a top level (not nested) field and that the value of that field is a simple value like number or string (*The decision to not allow deep equality check for nested structures was made for simplicity and performance reasons*).

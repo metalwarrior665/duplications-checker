@@ -10,18 +10,18 @@ Apify.main(async () => {
     console.dir(input);
 
     const {
-        apifyStorageId,
-        recordKey,
-        rawData,
+        datasetId,
         preCheckFunction,
         field,
-        limit,
-        offset = 0,
-        batchSize = 1000,
         minDuplications = 2,
         showIndexes = true,
         showItems = true,
         showMissing = true,
+        limit,
+        offset = 0,
+        batchSize = 1000,
+        keyValueStoreRecord,
+        rawData,
     } = input;
 
     const showOptions = {
@@ -34,20 +34,26 @@ Apify.main(async () => {
     if (!field) {
         throw new Error('Input should contain: "field"!');
     }
-    if (!apifyStorageId && !rawData) {
-        throw new Error('Input should contain at least one of: "apifyStorageId" or "rawData"!');
+    if (!datasetId && !keyValueStoreRecord && !rawData) {
+        throw new Error('Input should contain at least one of: "apifyStorageId", "keyValueStoreRecord" or "rawData"!');
     }
-    if (apifyStorageId && rawData) {
-        throw new Error('Input cannot contain both of: "apifyStorageId" or "rawData"!');
+    const providedDataInputs = [datasetId, rawData, keyValueStoreRecord].filter((dataInput) => !!dataInput);
+    if (providedDataInputs.length > 1) {
+        throw new Error('Input cannot contain more than one of: "apifyStorageId", "keyValueStoreRecord" or "rawData"! ');
+    }
+    if (keyValueStoreRecord && keyValueStoreRecord.split('+').length !== 2) {
+        throw new Error('Could not parse key value store ID and record key from "keyValueStoreRecord"!')
     }
     let preCheckFunctionEvaled;
-    try {
-        preCheckFunctionEvaled = eval(preCheckFunction);
-    } catch (e) {
-        throw new Error('Evaluating "preCheckFunction" failed, please inlcude valid javascript! Error:', e);
-    }
-    if (preCheckFunction && typeof preCheckFunctionEvaled !== 'function') {
-        throw new Error(`"preCheckFunction" should be a function! Instead it is ${typeof preCheckFunctionEvaled}`);
+    if (preCheckFunction) {
+        try {
+            preCheckFunctionEvaled = eval(preCheckFunction);
+        } catch (e) {
+            throw new Error('Evaluating "preCheckFunction" failed, please inlcude valid javascript! Error:', e);
+        }
+        if (typeof preCheckFunctionEvaled !== 'function') {
+            throw new Error(`"preCheckFunction" should be a function! Instead it is ${typeof preCheckFunctionEvaled}`);
+        }
     }
 
     const state = await Apify.getValue('STATE');
@@ -55,46 +61,15 @@ Apify.main(async () => {
         ? state.duplicatesState
         : {};
 
-    let datasetInfo;
-    let kvStoreData;
-    let totalItemCount;
-    if (apifyStorageId) {
-        datasetInfo = await Apify.client.datasets.getDataset({ datasetId: apifyStorageId })
-            .catch(() => console.log('Dataset with "apifyStorageId" was not found, we will try kvStore'));
-        if (datasetInfo) {
-            totalItemCount = datasetInfo.itemCount;
-            console.log('Total items in dataset:', totalItemCount);
-        } else {
-            console.log('dataset not found, will try KV store');
-            if (!recordKey) {
-                throw new Error('Cannot try to load from KV store without a "recordKey" input parameter');
-            }
-            kvStoreData = await Apify.client.keyValueStores.getRecord({ storeId: apifyStorageId, key: recordKey })
-                .then((res) => res.body)
-                .catch(() => { throw new Error(`Key-value store with "apifyStorageId": "${apifyStorageId}" and "recordKey": "${recordKey}" was not found, please input correct storage ids`); });
-            if (!Array.isArray(kvStoreData)) {
-                throw new Error('Data loaded from key value store must be an array!');
-            }
-            totalItemCount = kvStoreData.length;
-        }
-    }
-    if (rawData) {
-        if (!Array.isArray(rawData)) {
-            throw new Error('Raw data must be an array!');
-        }
-        totalItemCount = rawData.length;
-    }
-
-    if (rawData || kvStoreData) {
-        const duplicateItems = iterationFn({ items: preCheckFunctionEvaled(rawData || kvStoreData), duplicatesState, field, showOptions });
-        if (showItems) {
-            await Apify.pushData(duplicateItems);
-        }
-    } else if (datasetInfo) {
+    if (datasetId) {
+        const datasetInfo = await Apify.client.datasets.getDataset({ datasetId })
+            .catch(() => { throw new Error(`Dataset with "datasetId": "${datasetId}" was not found!`); });
+        const totalItemCount = datasetInfo.itemCount;
+        console.log('Total items in dataset:', totalItemCount);
         await loadAndProcessResults({
             iterationFn,
             preCheckFunction: preCheckFunctionEvaled,
-            datasetId: apifyStorageId,
+            datasetId,
             batchSize,
             limit: limit || totalItemCount,
             duplicatesState,
@@ -102,6 +77,32 @@ Apify.main(async () => {
             showOptions,
         },
         state ? state.offset : offset, state ? state.outputOffset : 0);
+    } else {
+        // KV store or rawData path
+        let data;
+        if (keyValueStoreRecord) {
+            const [storeId, key] = keyValueStoreRecord.split('+');
+            data = await Apify.client.keyValueStores.getRecord({ storeId, key })
+                .then((res) => res.body)
+                .catch(() => { throw new Error(`Key-value store record with "ID": "${storeId}" and "recordKey": "${key}" was not found! Please input correct storage.`); });
+        } else if (rawData) {
+            data = rawData;
+        }
+
+        if (!Array.isArray(data)) {
+            throw new Error('Data loaded from key value store must be an array!');
+        }
+        console.log(`Total items loaded: ${data.length}`);
+        const duplicateItems = iterationFn({
+            items: data,
+            preCheckFunction: preCheckFunctionEvaled,
+            duplicatesState,
+            field,
+            showOptions,
+        });
+        if (showItems) {
+            await Apify.pushData(duplicateItems);
+        }
     }
 
     await Apify.setValue('OUTPUT', prepareOutput(duplicatesState, minDuplications));

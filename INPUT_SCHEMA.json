@@ -4,26 +4,12 @@
     "schemaVersion": 1,
     "required": ["field"],
     "properties": {
-        "apifyStorageId": {
-            "title": "Apify Storage ID",
+        "datasetId": {
+            "title": "Dataset ID",
             "type": "string",
-            "description": "Id of dataset or key value store where the data are located.",
+            "description": "Id of dataset where the data are located. If you need to use other input types like Key value store or raw JSON, look at `Other data sources`",
             "editor": "textfield",
             "example": "s5NJ77qFv8b4osiGR"
-        },
-        "recordKey": {
-            "title": "Record Key",
-            "type": "string",
-            "description": "Only specify if Apify storage id points to a key value store! This is the record key under which the data are.",
-            "editor": "textfield",
-            "example": "MY-KEY"
-        },
-        "rawData": {
-            "title": "Raw Data",
-            "type": "array",
-            "description": "Raw JSON array you want to check.",
-            "editor": "json",
-            "example": [{"url": "https://example.com","price": 20},{"url": "https://google.com","price": 30}]
         },
         "field": {
             "title": "Field",
@@ -75,7 +61,7 @@
             "minimum": 1,
             "unit": "items",
             "example": 1000,
-            "sectionCaption": "dataset pagination",
+            "sectionCaption": "Dataset pagination options",
             "sectionDescription": "Allows you to pick parts of the dataset to check."
         },
         "offset":{
@@ -94,6 +80,22 @@
             "minimum": 1,
             "unit": "items",
             "example": 5000
+        },
+        "keyValueStoreRecord": {
+            "title": "Key value store Record",
+            "type": "string",
+            "description": "ID and record key if you want to load from KV store. Format is `{keyValueStoreId}+{recordKey}`, e.g. `s5NJ77qFv8b4osiGR+MY-KEY`",
+            "editor": "textfield",
+            "example": "s5NJ77qFv8b4osiGR+MY-KEY",
+            "sectionCaption": "Other data sources",
+            "sectionDescription": "Allows you to load from Key value store or arbitrary JSON."
+        },
+        "rawData": {
+            "title": "Raw Data",
+            "type": "array",
+            "description": "Raw JSON array you want to check.",
+            "editor": "json",
+            "example": [{"url": "https://example.com","price": 20},{"url": "https://google.com","price": 30}]
         }
     }
 }
