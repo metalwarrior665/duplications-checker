@@ -39,31 +39,6 @@
             "editor": "javascript",
             "example": "(data) => data.map((item) => ({ url: item.url, imageSrc: item.images && item.images[0] ? item.images[0].src : null }))"
         },
-        "limit":{
-            "title": "Limit",
-            "type": "integer",
-            "description": "How many items will be checked. Default is all",
-            "minimum": 1,
-            "unit": "items",
-            "example": 1000
-        },
-        "offset":{
-            "title": "Offset",
-            "type": "integer",
-            "description": "From which item the checking will start. Use with limit to check specific items.",
-            "minimum": 1,
-            "unit": "items",
-            "example": 20000
-        },
-        "batchSize":{
-            "title": "Batch Size",
-            "type": "integer",
-            "description": "You can change number of loaded and processed items in each batch. This is only needed if you have really huge items.",
-            "default": 1000,
-            "minimum": 1,
-            "unit": "items",
-            "example": 5000
-        },
         "minDuplications":{
             "title": "Minimum duplications",
             "type": "integer",
@@ -77,19 +52,52 @@
             "title": "Show indexes",
             "type": "boolean",
             "description": "Indexes of the duplicate items will be shown in the OUTPUT report. Set to false if you don't need them.",
-            "default": true
+            "default": true,
+            "groupCaption": "Show options",
+            "groupDescription": "Showing more will help you debug but uses more memory."
         },
         "showItems":{
             "title": "Show items",
             "type": "boolean",
             "description": "Duplicate items will be pushed to a dataset. Set to false if you don't need them.",
-            "default": true
+            "default": true,
+            "groupCaption": "Show options"
         },
         "showMissing":{
             "title": "Show missing fields",
             "type": "boolean",
             "description": "Items where the values for the `field` is missing or is `null` or `''` will be included in the report.",
-            "default": true
+            "default": true,
+            "groupCaption": "Show options"
+        },
+        "limit":{
+            "title": "Limit",
+            "type": "integer",
+            "description": "How many items will be checked. Default is all",
+            "minimum": 1,
+            "unit": "items",
+            "example": 1000,
+            "sectionCaption": "dataset pagination",
+            "sectionDescription": "Allows you to pick parts of the dataset to check."
+        },
+        "offset":{
+            "title": "Offset",
+            "type": "integer",
+            "description": "From which item the checking will start. Use with limit to check specific items.",
+            "minimum": 1,
+            "unit": "items",
+            "example": 20000,
+            "sectionCaption": "dataset pagination"
+        },
+        "batchSize":{
+            "title": "Batch Size",
+            "type": "integer",
+            "description": "You can change number of loaded and processed items in each batch. This is only needed if you have really huge items.",
+            "default": 1000,
+            "minimum": 1,
+            "unit": "items",
+            "example": 5000,
+            "sectionCaption": "dataset pagination"
         }
     }
 }
