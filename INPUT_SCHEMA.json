@@ -11,6 +11,12 @@
             "editor": "textfield",
             "example": "s5NJ77qFv8b4osiGR"
         },
+        "checkOnlyCleanItems": {
+            "title": "Check only clean dataset items",
+            "type": "boolean",
+            "description": "Only clean dataset items will be loaded and use for duplications checking if `datasetId` option is provided.",
+            "default": false
+        },
         "field": {
             "title": "Field",
             "type": "string",
