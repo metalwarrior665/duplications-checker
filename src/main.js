@@ -11,6 +11,7 @@ Apify.main(async () => {
 
     const {
         datasetId,
+        checkOnlyCleanItems = false,
         preCheckFunction,
         field,
         minDuplications = 2,
@@ -75,6 +76,7 @@ Apify.main(async () => {
             duplicatesState,
             field,
             showOptions,
+            checkOnlyCleanItems
         },
         state ? state.offset : offset, state ? state.outputOffset : 0);
     } else {

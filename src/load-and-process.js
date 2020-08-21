@@ -1,7 +1,7 @@
 const Apify = require('apify');
 
 module.exports = async (options, offset, outputOffset) => {
-    const { datasetId, batchSize, limit, preCheckFunction, duplicatesState, iterationFn, field, showOptions } = options;
+    const { datasetId, batchSize, limit, preCheckFunction, duplicatesState, iterationFn, field, showOptions, checkOnlyCleanItems } = options;
 
     while (true) {
         console.log(`loading setup: batchSize: ${batchSize}, limit left: ${limit - offset} total limit: ${limit}, offset: ${offset}`);
@@ -11,6 +11,7 @@ module.exports = async (options, offset, outputOffset) => {
             datasetId,
             offset,
             limit: currentLimit,
+            clean: checkOnlyCleanItems,
         }).then((res) => res.items);
 
         console.log(`loaded ${newItems.length} items`);
