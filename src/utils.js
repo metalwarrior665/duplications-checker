@@ -8,15 +8,17 @@ const { utils: { log } } = Apify;
  */
 const validateInput = async (input) => {
     const {
-        field, datasetId, rawData,
+        field, fields, datasetId, rawData,
         keyValueStoreRecord,
     } = input;
 
-    if (!field) {
-        throw new Error('Input should contain: "field"!');
+    if (!field && !fields) throw new Error('At least one of the "field" or "fields" options must be provided!');
+
+    if (field && typeof field !== "string") {
+        throw new Error('The input option "field" should contain string value!');
     }
-    if (typeof field !== "string" && !Array.isArray(field)) {
-        throw new Error('The input option "field" should contain string value either or an array of string values!');
+    if (fields && !Array.isArray(fields)) {
+        throw new Error('The input option "fields" should contain an array of string values!');
     }
     if (!datasetId && !keyValueStoreRecord && !rawData) {
         throw new Error('Input should contain at least one of: "apifyStorageId", "keyValueStoreRecord" or "rawData"!');
@@ -87,7 +89,7 @@ const loadDataFromStoreOrThrow = async (keyValueStoreRecord) => {
  * @return {Promise<void>}
  */
 const loadAndProcessResults = async (options, offset, outputOffset) => {
-    const { datasetId, batchSize, limit, preCheckFunction, duplicatesState, field, showOptions, checkOnlyCleanItems } = options;
+    const { datasetId, batchSize, limit, preCheckFunction, duplicatesState, fields, showOptions, checkOnlyCleanItems } = options;
 
     while (true) {
         log.info(`loading setup: batchSize: ${batchSize}, limit left: ${limit - offset} total limit: ${limit}, offset: ${offset}`);
@@ -102,7 +104,7 @@ const loadAndProcessResults = async (options, offset, outputOffset) => {
 
         log.info(`loaded ${newItems.length} items`);
 
-        const duplicateItems = iterationFunction({ items: newItems, duplicatesState, preCheckFunction, field, showOptions }, offset, outputOffset);
+        const duplicateItems = iterationFunction({ items: newItems, duplicatesState, preCheckFunction, fields, showOptions }, offset, outputOffset);
         if (showOptions.showItems) {
             await Apify.pushData(duplicateItems);
         }
@@ -137,14 +139,14 @@ const prepareOutput = (duplicatesState, minDuplications) => {
  *  Iterates through all the provided items and checks each of item for duplicates
  * @param {function} preCheckFunction
  * @param {object[]} items
- * @param {string|string[]} field
+ * @param {string[]} fields
  * @param {object} duplicatesState
  * @param {object} showOptions
  * @param {number} offset
  * @param {number} outputOffset
  * @return {[]}
  */
-const iterationFunction = ({ preCheckFunction, items, field, duplicatesState, showOptions }, offset = 0, outputOffset = 0) => {
+const iterationFunction = ({ preCheckFunction, items, fields, duplicatesState, showOptions }, offset = 0, outputOffset = 0) => {
     let updatedItems;
     if (preCheckFunction) {
         updatedItems = preCheckFunction(items);
@@ -158,17 +160,11 @@ const iterationFunction = ({ preCheckFunction, items, field, duplicatesState, sh
     updatedItems.forEach((item, index) => {
         const originalIndex = index + offset;
         // This function returns array of 0, 1 or 2 duplicate items. It also manipulates the state.
-        if (Array.isArray(field)) {
-            field.forEach((fieldToCheck) => {
-                const duplicateItems = checkItemField({ field: fieldToCheck, item, duplicatesState, showOptions, originalIndex, outputIndex });
+        fields.forEach((field) => {
+                const duplicateItems = checkItemField({ field, item, duplicatesState, showOptions, originalIndex, outputIndex });
                 mainDuplicateItems.push(...duplicateItems);
                 outputIndex += duplicateItems.length;
             })
-        } else {
-            const duplicateItems = checkItemField({ field, item, duplicatesState, showOptions, originalIndex, outputIndex });
-            mainDuplicateItems.push(...duplicateItems);
-            outputIndex += duplicateItems.length;
-        }
     });
 
     return mainDuplicateItems;

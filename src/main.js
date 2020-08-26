@@ -14,7 +14,8 @@ Apify.main(async () => {
         datasetId,
         checkOnlyCleanItems = false,
         preCheckFunction,
-        field,
+        field, // outdated, use fields instead
+        fields = [],
         minDuplications = 2,
         showIndexes = true,
         showItems = true,
@@ -36,6 +37,11 @@ Apify.main(async () => {
     // input validation
    await validateInput(input);
 
+   if (field) {
+       log.warning('Input option "field" is outdated. Checking for more fields is available. Start using "fields" option instead.');
+       fields.push(field);
+   }
+
    let pareCheckFunctionEvaluated;
     if (preCheckFunction) {
         pareCheckFunctionEvaluated = await getEvaluatedCheckFncOrThrow(preCheckFunction);
@@ -55,7 +61,7 @@ Apify.main(async () => {
             batchSize,
             limit: limit || totalItemCount,
             duplicatesState,
-            field,
+            fields,
             showOptions,
             checkOnlyCleanItems
         };
@@ -79,7 +85,7 @@ Apify.main(async () => {
             items: data,
             preCheckFunction: pareCheckFunctionEvaluated,
             duplicatesState,
-            field,
+            fields,
             showOptions,
         };
         const duplicateItems = iterationFunction(iterationFunctionOptions);
