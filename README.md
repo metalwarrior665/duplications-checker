@@ -41,10 +41,10 @@ This actor expects a JSON object as an input. You can also set it up in a visual
 **Main input fields**
 
 - `datasetId` <[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type)> Id of dataset where the data are located. If you need to use other input types like Key value store or raw JSON, use `keyValueStoreRecord` or `rawData` **You have specify this, `keyValueStoreRecord` or `rawData` but only one of them**
-- `checkOnlyCleanItems`: <[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> Only clean dataset items will be loaded and use for duplications checking if `datasetId` option is provided. **Default: false**
-- `field` <[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type)> Field in each item that will be checked for duplicates. The field must not be nested and it should contain only simple value (string or number). You can prepare your data with [preCheckFunction](#preCheckFunction). **Required**
+- `checkOnlyCleanItems` <[boolean](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> Only clean dataset items will be loaded and use for duplications checking if `datasetId` option is provided. **Default: false**
+- `field` <[string](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type)>|<[array](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array)> Field or list of fields in each item that will be checked for duplicates. Each field must not be nested and it should contain only simple value (string or number). You can prepare your data with [preCheckFunction](#preCheckFunction). **Required**
 - `preCheckFunction` <[stringified function](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Guide/Functions)> Stringified javascipt function that can apply arbitrary transformation to the input data before the check. See [preCheckFunction](#preCheckFunction) section. **Optional**
-- `minDuplications`: <[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> Minimum occurences to be included in the report. **Default: 2**
+- `minDuplications` <[number](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type)> Minimum occurences to be included in the report. **Default: 2**
 
 **Show options**
 
