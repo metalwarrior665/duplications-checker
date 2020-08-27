@@ -2,7 +2,7 @@
     "title": "Duplications checker input",
     "type": "object",
     "schemaVersion": 1,
-    "required": ["field"],
+    "required": ["fields"],
     "properties": {
         "datasetId": {
             "title": "Dataset ID",
